@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مصيف مطروح | Aly Tech</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#7c3aed">
+    <link rel="apple-touch-icon" href="1000580696.png">
+    <link rel="icon" type="image/png" href="1000580696.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.4/photoswipe.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.4/umd/photoswipe.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.4/umd/photoswipe-lightbox.umd.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* [تم الإبقاء على جميع الأنماط السابقة كما هي بدون حذف] */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root { 
+            --primary: #7c3aed; 
+            --primary-dark: #5b21b6; 
+            --primary-light: #a78bfa; 
+            --primary-glow: rgba(124, 58, 237, 0.2);
+            --accent: #f59e0b; 
+            --accent-dark: #d97706;
+            --bg: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text: #1e1b4b; 
+            --text-light: #6b7280;
+            --success: #059669;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-xl: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+        }
+
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden; 
+        }
+        
+        header { 
+            padding: 12px 20px; 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(20px); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            border-bottom: 2px solid rgba(124, 58, 237, 0.1);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        header.hide-header {
+            display: none;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo img {
+            height: 45px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .logo span {
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.3rem;
+        }
+
+        .main-nav { 
+            display: flex; 
+            justify-content: center;
+            gap: 8px; 
+            padding: 12px 10px; 
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+            position: sticky;
+            top: 69px;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+
+        .main-nav.hide-nav {
+            display: none;
+        }
+
+        .nav-tab { 
+            padding: 8px 12px; 
+            border-radius: 50px; 
+            background: white;
+            color: var(--text-light); 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            font-size: 0.8rem;
+            flex: 1;
+            justify-content: center;
+            max-width: 120px;
+        }
+
+        .nav-tab:hover {
+            background: rgba(124, 58, 237, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active { 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; 
+            box-shadow: 0 4px 12px -2px var(--primary);
+            border-color: var(--primary);
+        }
+
+        .glass-btn { 
+            background: rgba(124, 58, 237, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            color: var(--primary); 
+            padding: 10px 18px; 
+            border-radius: 16px; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-weight: 700; 
+            transition: all 0.3s ease; 
+        }
+
+        .glass-btn:hover { 
+            background: var(--primary); 
+            color: white; 
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); 
+            gap: 20px; 
+            padding: 20px; 
+        }
+
+        @media (min-width: 600px) { 
+            .container { 
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            } 
+        }
+        
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 32px; 
+            overflow: hidden; 
+            border: 1px solid rgba(124, 58, 237, 0.1); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            position: relative; 
+            cursor: pointer; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: var(--shadow-md);
+        }
+
+        .card:hover { 
+            transform: translateY(-12px) scale(1.02); 
+            border-color: var(--primary); 
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .card img { 
+            width: 100%; 
+            aspect-ratio: 4/3; 
+            object-fit: cover; 
+            background: linear-gradient(135deg, #e9d5ff, #f3e8ff);
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+        }
+        
+        .area-badge { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            backdrop-filter: blur(8px); 
+            color: white; 
+            padding: 6px 14px; 
+            border-radius: 50px; 
+            font-size: 0.75rem; 
+            font-weight: 800; 
+            z-index: 2; 
+            box-shadow: var(--shadow-sm);
+            letter-spacing: 0.5px;
+        }
+        
+        .price-tag { 
+            position: absolute; 
+            bottom: 100px; 
+            left: 15px; 
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark)); 
+            color: white; 
+            padding: 8px 18px; 
+            border-radius: 50px; 
+            font-weight: 900; 
+            box-shadow: var(--shadow-md); 
+            font-size: 1rem; 
+            border: 2px solid white;
+            letter-spacing: 0.5px;
+        }
+
+        .p-body { 
+            padding: 18px; 
+            flex-grow: 1; 
+        }
+
+        .unit-title { 
+            font-size: 1.1rem; 
+            font-weight: 800; 
+            color: var(--text); 
+            margin-bottom: 12px; 
+            display: block;
+            line-height: 1.4;
+        }
+        
+        .book-btn { 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; 
+            padding: 14px; 
+            border-radius: 60px; 
+            font-weight: 800; 
+            border: none; 
+            cursor: pointer; 
+            width: 100%; 
+            transition: all 0.3s ease; 
+            font-family: 'Cairo';
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .book-btn:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -6px var(--primary);
+        }
+        
+        .sidebar { 
+            position: fixed; 
+            top: 0; 
+            right: -100%; 
+            width: 85%; 
+            max-width: 350px; 
+            height: 100%; 
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 2000; 
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: var(--shadow-xl); 
+            overflow-y: auto; 
+            border-radius: 32px 0 0 32px;
+        }
+
+        .sidebar.active { 
+            right: 0; 
+        }
+
+        .overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.6); 
+            backdrop-filter: blur(4px);
+            z-index: 1500; 
+        }
+        
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.8); 
+            backdrop-filter: blur(8px);
+            z-index: 5000; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px; 
+        }
+
+        .modal-content { 
+            background: white; 
+            width: 100%; 
+            max-width: 450px; 
+            padding: 30px; 
+            border-radius: 40px; 
+            position: relative; 
+            max-height: 85vh; 
+            overflow-y: auto; 
+            box-shadow: var(--shadow-xl);
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        /* أنماط نافذة التثبيت PWA */
+        #pwa-install-banner {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            padding: 15px;
+            border-radius: 25px;
+            box-shadow: var(--shadow-xl);
+            z-index: 9999;
+            border: 2px solid var(--primary-light);
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        .pwa-info { display: flex; align-items: center; gap: 10px; }
+        .pwa-info img { width: 50px; border-radius: 12px; }
+        .pwa-btns { display: flex; gap: 10px; }
+        .pwa-install-btn { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 12px; font-weight: 700; cursor: pointer; font-family: 'Cairo'; }
+        .pwa-close-btn { background: #eee; color: #666; border: none; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-family: 'Cairo'; }
+
+        /* [بقية الأنماط كما هي تماماً] */
+        #quickFilters {
+            padding: 15px 20px;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+            scrollbar-width: thin;
+            transition: all 0.3s ease;
+        }
+
+        #quickFilters.hide-filters {
+            display: none;
+        }
+
+        #quickFilters::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .detail-section { 
+            background: white; 
+            border-radius: 32px; 
+            padding: 25px; 
+            margin-bottom: 20px; 
+            margin-top: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-right: 4px solid var(--primary);
+            padding-right: 15px;
+        }
+
+        .slider-wrapper { 
+            position: relative; 
+            width: 100%; 
+            overflow: hidden; 
+            border-radius: 50px; 
+            background: #f5f3ff; 
+            margin: 20px 0; 
+        }
+        
+        .slider-container { 
+            display: flex; 
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            direction: ltr; 
+        }
+        
+        .slider-container img { 
+            width: 100%; 
+            flex-shrink: 0; 
+            height: 300px;
+            object-fit: cover; 
+            background: white; 
+            cursor: zoom-in;
+            border-radius: 50px;
+        }
+
+        .slider-nav { 
+            position: absolute; 
+            top: 50%; 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-between; 
+            transform: translateY(-50%); 
+            padding: 0 10px; 
+            box-sizing: border-box; 
+            pointer-events: none; 
+        }
+
+        .nav-btn { 
+            pointer-events: auto; 
+            background: rgba(124, 58, 237, 0.6); 
+            color: white; 
+            border: none; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover { 
+            background: rgba(124, 58, 237, 0.9); 
+        }
+
+        .pswp {
+            direction: ltr;
+            --pswp-bg: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+        }
+        
+        .pswp__img {
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .price-box-container { 
+            background: linear-gradient(135deg, #faf5ff, #fff);
+            padding: 25px; 
+            border-radius: 32px; 
+            border: 2px solid rgba(124, 58, 237, 0.1);
+            margin: 20px 0; 
+            text-align: center; 
+            box-shadow: var(--shadow-md);
+        }
+
+        .price-main-val { 
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 2.5rem; 
+            font-weight: 900; 
+            margin-bottom: 15px; 
+            display: block;
+        }
+
+        .feature-row { 
+            background: linear-gradient(135deg, #faf5ff, #fff);
+            padding: 14px 18px; 
+            border-radius: 20px; 
+            margin-bottom: 10px; 
+            border-right: 5px solid var(--primary); 
+            box-shadow: var(--shadow-sm); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            font-size: 0.95rem; 
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .feature-row:hover {
+            transform: translateX(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .extra-fields-section {
+            background: linear-gradient(135deg, #fef3c7, #fffbeb);
+            border: 2px solid var(--accent);
+            border-radius: 32px;
+            padding: 25px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .extra-fields-section .section-title {
+            color: var(--accent-dark);
+            border-right-color: var(--accent);
+        }
+
+        .extra-field-row {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 14px 18px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            border-right: 5px solid var(--accent);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .extra-field-row:hover {
+            transform: translateX(-5px);
+            box-shadow: var(--shadow-md);
+            background: white;
+        }
+
+        .sb-header { 
+            padding: 30px; 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            text-align: center; 
+            color: white;
+            border-radius: 0 0 40px 40px;
+        }
+
+        .sb-header h2 {
+            margin: 15px 0 0;
+            font-size: 1.4rem;
+        }
+        
+        .sidebar-item { 
+            padding: 18px 25px; 
+            border-bottom: 1px solid rgba(124, 58, 237, 0.1); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            font-weight: 700; 
+            transition: all 0.3s ease; 
+            color: var(--text);
+            justify-content: space-between;
+        }
+
+        .sidebar-item:hover { 
+            background: linear-gradient(135deg, #faf5ff, #fff);
+            color: var(--primary); 
+        }
+
+        .info-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin: 15px 0; 
+            background: linear-gradient(135deg, #faf5ff, #fff);
+            padding: 15px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            text-decoration: none; 
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .info-row:hover {
+            transform: translateX(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .info-row i { 
+            color: var(--primary); 
+            font-size: 1.3rem; 
+        }
+
+        .map-preview-image {
+            width: 100%;
+            border-radius: 24px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .map-preview-image:hover {
+            transform: scale(1.02);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* تعديلات الفيديو الجديدة */
+        .video-placeholder {
+            width: 100%;
+            border-radius: 0;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+        }
+        .video-placeholder img { width: 100%; display: block; filter: brightness(0.7); }
+        .play-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: white; font-size: 3.5rem; text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        #videoModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 6000; justify-content: center; align-items: center;
+        }
+        .video-wrapper-inner {
+            position: relative; width: 100%; max-width: 100%; aspect-ratio: 16/9;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; justify-content: center;
+        }
+        #videoModal iframe { width: 100%; height: 100%; border: none; border-radius: 0; }
+        .video-controls {
+            position: absolute; top: 10px; right: 10px; width: auto; display: flex;
+            gap: 10px; z-index: 6001;
+        }
+        .ctrl-btn {
+            background: rgba(124, 58, 237, 0.8); color: white; border: none;
+            width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .back-btn, .share-btn {
+            cursor: pointer;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(124, 58, 237, 0.1);
+            padding: 10px 20px;
+            border-radius: 60px;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Cairo';
+            font-size: 0.95rem;
+        }
+
+        .back-btn {
+            color: var(--primary);
+        }
+
+        .share-btn {
+            color: var(--primary);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .back-btn:hover, .share-btn:hover {
+            transform: translateY(-2px);
+            background: var(--primary);
+            color: white;
+        }
+
+        .dropdown-content {
+            display: none;
+            background: #f8f9fa;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.05);
+        }
+        
+        .dropdown-content.show {
+            display: block;
+        }
+        
+        .sub-dropdown-item {
+            padding: 12px 45px;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            transition: all 0.3s;
+        }
+        
+        .sub-dropdown-item:hover {
+            background: #fff;
+            color: var(--primary);
+            padding-right: 55px;
+        }
+
+        .reviews-container {
+            margin-top: 20px;
+        }
+        .avg-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 40px;
+            border: 1px solid var(--primary-light);
+        }
+        .stars-container {
+            direction: ltr;
+            unicode-bidi: bidi-override;
+            color: #ffc107;
+            font-size: 1.5rem;
+        }
+        .star-filled { color: #fbbf24; }
+        .star-empty { color: #e5e7eb; }
+        .review-card {
+            background: #f9f9ff;
+            border-radius: 24px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-right: 4px solid var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .reviewer-name {
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+        .review-rating i {
+            font-size: 0.9rem;
+            margin: 0 1px;
+        }
+        .review-comment {
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+        .review-date {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+        .add-review-form {
+            background: #fff;
+            border-radius: 32px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 2px solid rgba(124, 58, 237, 0.2);
+        }
+        .rating-input {
+            direction: ltr;
+            unicode-bidi: bidi-override;
+            display: inline-flex;
+            gap: 8px;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+        .rating-input i {
+            color: #e5e7eb;
+            transition: 0.2s;
+        }
+        .rating-input i.active-star {
+            color: #fbbf24;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: #fff;
+        }
+        .submit-review-btn {
+            background: linear-gradient(135deg, var(--success), #047857);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+        }
+        .refresh-reviews-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-right: auto;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .price-tag {
+                bottom: 85px;
+                font-size: 0.85rem;
+                padding: 6px 14px;
+            }
+            
+            .unit-title {
+                font-size: 0.95rem;
+            }
+            
+            .book-btn {
+                padding: 12px;
+                font-size: 0.85rem;
+            }
+
+            .slider-wrapper {
+                min-height: 250px;
+                border-radius: 35px;
+            }
+
+            .slider-container img {
+                height: 250px;
+                border-radius: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<div id="videoModal">
+    <div class="video-controls">
+        <button class="ctrl-btn" onclick="rotateVideo()"><i class="fas fa-sync-alt"></i></button>
+        <button class="ctrl-btn" onclick="closeVideo()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="video-wrapper-inner" id="videoWrapperInner">
+        <iframe id="videoIframe" src="" allowfullscreen></iframe>
+    </div>
+</div>
+
+<div id="aboutModal" class="modal">
+    <div class="modal-content">
+        <div style="text-align: center;">
+            <div style="background: linear-gradient(135deg, #f0f9ff, #e9d5ff); width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fas fa-store" style="font-size: 3rem; color: var(--primary);"></i>
+            </div>
+            <h2 style="color:var(--primary); margin:0;">Aly Tech للتطوير الرقمي</h2>
+            <p style="color: var(--text-light); margin-top: 10px; line-height: 1.6;">نحن نقدم حلولاً تقنية متكاملة للمتاجر الإلكترونية وتصميم المواقع الحديثة.</p>
+        </div>
+        <div style="margin: 25px 0;">
+            <a href="mailto:alytech8@gmail.com" class="info-row"><i class="fas fa-envelope"></i><span>alytech8@gmail.com</span></a>
+            <a href="tel:01214277900" class="info-row"><i class="fas fa-phone-alt"></i><span>01214277900</span></a>
+        </div>
+        <button class="book-btn" onclick="closeModal('aboutModal')" style="background: linear-gradient(135deg, var(--success), #047857);">إغلاق</button>
+    </div>
+</div>
+
+<div id="privacyModal" class="modal">
+    <div class="modal-content">
+        <h2 style="text-align:center; color:var(--primary); margin-top:0;"><i class="fas fa-user-shield"></i> سياسة الخصوصية</h2>
+        <div style="max-height: 300px; overflow-y: auto; padding-left: 8px; line-height: 1.8; color: var(--text-light); font-size: 0.95rem; text-align: justify;">
+            <p>نحن نلتزم بحماية بياناتك: يتم جمع الاسم والهاتف فقط لتسهيل تواصلك مع صاحب الخدمة عبر واتساب. المنصة وسيط إعلاني فقط ولا تتحمل أي مسؤولية عن المعاملات بين الأطراف.</p>
+            <p style="margin-top: 15px;">يتم استخدام بياناتك فقط للتواصل ولا يتم مشاركتها مع أي طرف ثالث.</p>
+        </div>
+        <button class="book-btn" onclick="closeModal('privacyModal')" style="margin-top: 25px; background: linear-gradient(135deg, var(--primary), var(--primary-dark));">فهمت ذلك</button>
+    </div>
+</div>
+
+<header id="mainHeader">
+    <div class="logo" onclick="location.reload()">
+        <img src="1000580696.png" alt="Aly Tech">
+        <span>مصيف مطروح</span>
+    </div>
+    <div class="glass-btn" onclick="toggleMenu()" style="font-size: 1.3rem; padding: 10px 20px;"><i class="fas fa-bars"></i></div>
+</header>
+
+<div class="main-nav" id="mainNav">
+    <div class="nav-tab active" onclick="setMainType('units', this)"><i class="fas fa-bed"></i> شقق</div>
+    <div class="nav-tab" onclick="setMainType('restaurants', this)"><i class="fas fa-utensils"></i> مطاعم</div>
+    <div class="nav-tab" onclick="setMainType('trips', this)"><i class="fas fa-ship"></i> رحلات</div>
+</div>
+
+<div id="sidebar" class="sidebar">
+    <div class="sb-header">
+        <img src="1000580696.png" alt="Aly Tech" style="width: 85px; border-radius: 25px; border: 3px solid white; box-shadow: var(--shadow-md);">
+        <h2>مصيف مطروح</h2>
+        <p style="font-size: 0.8rem; opacity: 0.9;">تطوير وتصميم رقمي</p>
+    </div>
+    <h3 style="color:var(--primary); padding: 20px 25px 10px; margin:0; font-size: 1.1rem;"><i class="fas fa-tags"></i> التصنيفات</h3>
+    
+    <div class="sidebar-item" onclick="toggleDropdown('mainCatsDropdown')">
+        <span><i class="fas fa-layer-group"></i> الأقسام الرئيسية</span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="mainCatsDropdown" class="dropdown-content">
+        <div class="sub-dropdown-item" onclick="setMainTypeSidebar('units')"><i class="fas fa-bed"></i> شقق ومصايف</div>
+        <div class="sub-dropdown-item" onclick="setMainTypeSidebar('restaurants')"><i class="fas fa-utensils"></i> مطاعم وكافيهات</div>
+        <div class="sub-dropdown-item" onclick="setMainTypeSidebar('trips')"><i class="fas fa-ship"></i> رحلات وفسح</div>
+    </div>
+
+    <div class="sidebar-item" onclick="toggleDropdown('subCatsDropdown')">
+        <span><i class="fas fa-list-ul"></i> الأقسام الفرعية</span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+    <div id="subCatsDropdown" class="dropdown-content">
+        <div id="catsListSidebar"></div>
+    </div>
+    
+    <div style="border-top: 1px solid rgba(124, 58, 237, 0.1); margin: 10px 0;"></div>
+    <div class="sidebar-item" onclick="openModal('aboutModal')"><i class="fas fa-info-circle"></i> من نحن</div>
+    <div class="sidebar-item" onclick="openModal('privacyModal')"><i class="fas fa-user-shield"></i> سياسة الخصوصية</div>
+</div>
+
+<div id="loader" style="text-align:center; padding:60px; display:none;"><i class="fas fa-spinner fa-pulse fa-3x" style="color:var(--primary);"></i></div>
+<div id="quickFilters" style="padding:12px 20px; display:flex; gap:10px; overflow-x:auto; white-space:nowrap; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(124, 58, 237, 0.1);"></div>
+
+<div class="container" id="grid"></div>
+
+<div id="landingPage" style="display:none; padding:20px; max-width: 800px; margin: 0 auto;">
+    <div id="productContent"></div>
+</div>
+
+<div id="pwa-install-banner">
+    <div class="pwa-info">
+        <img src="1000580696.png" alt="App Icon">
+        <div>
+            <div style="font-weight: 800; font-size: 0.9rem;">تثبيت تطبيق مصيف مطروح</div>
+            <div style="font-size: 0.75rem; color: #666;">وصول أسرع وتجربة أفضل</div>
+        </div>
+    </div>
+    <div class="pwa-btns">
+        <button class="pwa-install-btn" id="btnInstall">تثبيت</button>
+        <button class="pwa-close-btn" id="btnCancelPwa">لاحقاً</button>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCSUx9cK6ntL2laSqKSuA1GgEWPj6KlUY8",
+        authDomain: "marsa-matrouh-app.firebaseapp.com",
+        projectId: "marsa-matrouh-app",
+        storageBucket: "marsa-matrouh-app.firebasestorage.app",
+        messagingSenderId: "141332565878",
+        appId: "1:141332565878:web:ff7dbc02cdd55a13783457"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let currentUnit = "", ownerWhatsApp = "201214277900", currentProductId = null;
+    let currentMainType = "units"; 
+    let currentImagesForLightbox = [];
+    let lightbox = null; 
+    let unsubscribeProducts = null; 
+    let videoRotation = 0;
+    let unsubscribeReviews = null;
+
+    // ----- كود تثبيت PWA -----
+    let deferredPrompt;
+    const installBanner = document.getElementById('pwa-install-banner');
+    const btnInstall = document.getElementById('btnInstall');
+    const btnCancel = document.getElementById('btnCancelPwa');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBanner.style.display = 'flex';
+    });
+
+    btnInstall.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            installBanner.style.display = 'none';
+        }
+    });
+
+    btnCancel.addEventListener('click', () => {
+        installBanner.style.display = 'none';
+    });
+    // ------------------------
+
+    function toggleDropdown(id) {
+        document.getElementById(id).classList.toggle('show');
+    }
+
+    function setMainTypeSidebar(type) {
+        currentMainType = type;
+        const tabs = document.querySelectorAll('.nav-tab');
+        tabs.forEach(t => {
+            t.classList.remove('active');
+            if(t.getAttribute('onclick').includes(`'${type}'`)) t.classList.add('active');
+        });
+        loadStore();
+        loadCategoriesForSidebar();
+        document.getElementById('subCatsDropdown').classList.add('show');
+    }
+
+    function setMainType(type, element) {
+        currentMainType = type;
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        element.classList.add('active');
+        loadStore();
+        loadCategoriesForSidebar();
+    }
+
+    function toggleMenu() {
+        const sb = document.getElementById('sidebar');
+        const isActive = sb.classList.toggle('active');
+        document.getElementById('overlay').style.display = isActive ? 'block' : 'none';
+        if(!isActive) {
+            document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+        }
+    }
+
+    function openModal(id) {
+        if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
+        document.getElementById(id).style.display = "flex";
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = "none"; }
+
+    function openLightbox(index) {
+        if (!currentImagesForLightbox || currentImagesForLightbox.length === 0) return;
+        if (lightbox) {
+            lightbox.close();
+            lightbox = null;
+        }
+        const items = currentImagesForLightbox.map(src => ({
+            src: src,
+            w: 1200, 
+            h: 800,  
+            alt: 'صورة المنتج'
+        }));
+        const newLightbox = new PhotoSwipeLightbox({
+            gallery: '#dummy-gallery',
+            children: 'a',
+            pswpModule: PhotoSwipe,
+            bgOpacity: 0.95,
+            showHideOpacity: true,
+            initialIndex: index,
+            loop: true,
+            arrowKeys: true,
+            zoom: true,
+            closeOnVerticalDrag: true
+        });
+        newLightbox.addFilter('numItems', () => items.length);
+        newLightbox.addFilter('itemData', (itemData, idx) => items[idx]);
+        newLightbox.init();
+        newLightbox.loadAndOpen(index);
+        newLightbox.on('itemLoad', (e) => {
+            const img = new Image();
+            img.src = e.item.src;
+            img.onload = () => {
+                e.item.w = img.width;
+                e.item.h = img.height;
+                if (newLightbox.pswp) {
+                    newLightbox.pswp.refreshSlideContent(e.index);
+                }
+            };
+        });
+        newLightbox.on('close', () => {
+            if (lightbox === newLightbox) lightbox = null;
+        });
+        lightbox = newLightbox;
+    }
+
+    function getFirstValidImage(p) {
+        let baseUrl = '1000580696.png';
+        if (p.images && Array.isArray(p.images) && p.images.length > 0 && p.images[0]) {
+            baseUrl = p.images[0];
+        } else if (p.img) {
+            baseUrl = p.img;
+        }
+        return baseUrl;
+    }
+
+    function getAllValidImages(p) {
+        let imgs = [];
+        if (p.images && Array.isArray(p.images) && p.images.length > 0) {
+            p.images.forEach(i => { 
+                if(i && i.trim() !== '') {
+                    imgs.push(i);
+                }
+            });
+        } else if (p.img && p.img.trim() !== '') {
+            imgs.push(p.img);
+        }
+        if (imgs.length === 0) {
+            imgs.push('1000580696.png');
+        }
+        return imgs;
+    }
+
+    function renderCard(doc) {
+        const p = doc.data();
+        const mainImg = getFirstValidImage(p);
+        document.getElementById("grid").innerHTML += `
+            <div class="card" onclick="openProduct('${doc.id}')">
+                <div class="area-badge"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(p.category) || 'مطروح'}</div>
+                <img src="${mainImg}" loading="lazy" onerror="this.src='1000580696.png'">
+                <div class="price-tag">${p.price || 0} ج.م</div>
+                <div class="p-body">
+                    <span class="unit-title">${escapeHtml(p.name)}</span>
+                    <button class="book-btn"><i class="fas fa-eye"></i> عرض التفاصيل الكاملة</button>
+                </div>
+            </div>`;
+    }
+
+    function loadStore() {
+        const grid = document.getElementById("grid");
+        grid.style.display = "grid";
+        grid.innerHTML = "";
+        document.getElementById("landingPage").style.display = "none";
+        document.getElementById("loader").style.display = "block";
+        document.getElementById('mainHeader').classList.remove('hide-header');
+        document.getElementById('mainNav').classList.remove('hide-nav');
+        document.getElementById('quickFilters').classList.remove('hide-filters');
+        
+        const newUrl = window.location.pathname;
+        window.history.pushState({}, '', newUrl);
+
+        if (unsubscribeProducts) {
+            unsubscribeProducts();
+        }
+        unsubscribeProducts = db.collection("products")
+            .where("mainType", "==", currentMainType)
+            .onSnapshot(snap => {
+                document.getElementById("loader").style.display = "none";
+                grid.innerHTML = "";
+                let count = 0;
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if(data.hidden !== true) {
+                        renderCard(doc);
+                        count++;
+                    }
+                });
+                if(count === 0) {
+                    grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:60px 20px;'><i class='fas fa-box-open' style='font-size: 3rem; color: var(--primary-light); margin-bottom: 15px; display: block;'></i><p style='color: var(--text-light); font-size: 1.1rem;'>لا توجد وحدات متوفرة حالياً في هذا القسم</p></div>";
+                }
+            }, error => {
+                console.error(error);
+                document.getElementById("loader").style.display = "none";
+                grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:60px;'><p style='color: var(--danger);'>حدث خطأ في تحميل البيانات</p></div>";
+            });
+    }
+
+    async function filterBySubCategory(subCatName) {
+        if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        document.getElementById("loader").style.display = "block";
+        if (unsubscribeProducts) unsubscribeProducts();
+        unsubscribeProducts = db.collection("products")
+            .where("mainType", "==", currentMainType)
+            .where("category", "==", subCatName)
+            .onSnapshot(snap => {
+                document.getElementById("loader").style.display = "none";
+                grid.innerHTML = "";
+                snap.forEach(doc => {
+                    if(doc.data().hidden !== true) renderCard(doc);
+                });
+                if (snap.empty) {
+                    grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:60px;'><p style='color: var(--text-light);'>لا توجد منتجات في هذا التصنيف</p></div>";
+                }
+            }, error => {
+                console.error(error);
+                document.getElementById("loader").style.display = "none";
+                grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:60px;'><p style='color: var(--danger);'>حدث خطأ</p></div>";
+            });
+    }
+
+    async function loadCategoriesForSidebar() {
+        try {
+            const catsListSidebar = document.getElementById("catsListSidebar");
+            const quickFilters = document.getElementById("quickFilters");
+            catsListSidebar.innerHTML = "";
+            quickFilters.innerHTML = '<button class="glass-btn" onclick="loadStore()"><i class="fas fa-border-all"></i> الكل</button>';
+            const subCatsSnap = await db.collection("sub_categories")
+                .where("parentType", "==", currentMainType).get();
+            subCatsSnap.forEach(doc => {
+                const sub = doc.data().name;
+                catsListSidebar.innerHTML += `<div class="sub-dropdown-item" onclick="filterBySubCategory('${sub.replace(/'/g, "\\'")}')"><i class="fas fa-location-dot"></i> ${escapeHtml(sub)}</div>`;
+                quickFilters.innerHTML += `<button class="glass-btn" onclick="filterBySubCategory('${sub.replace(/'/g, "\\'")}')"><i class="fas fa-tag"></i> ${escapeHtml(sub)}</button>`;
+            });
+        } catch(e) { console.log(e); }
+    }
+
+    function shareProduct() {
+        const baseUrl = window.location.origin + window.location.pathname;
+        const shareUrl = `${baseUrl}?id=${currentProductId}`;
+        const productName = currentUnit;
+
+        if (navigator.share) {
+            navigator.share({
+                title: productName,
+                text: `تفقد ${productName} على تطبيق مصيف مطروح`,
+                url: shareUrl
+            }).catch(() => {});
+        } else {
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = shareUrl;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            alert('تم نسخ رابط صفحة الهبوط! يمكنك مشاركته الآن');
+        }
+    }
+
+    function openVideo(vId) {
+        videoRotation = 0;
+        const modal = document.getElementById('videoModal');
+        const iframe = document.getElementById('videoIframe');
+        const inner = document.getElementById('videoWrapperInner');
+        
+        iframe.src = `https://www.youtube.com/embed/${vId}?autoplay=1&rel=0`;
+        inner.style.transform = `rotate(0deg)`;
+        inner.style.width = "100%";
+        inner.style.height = "auto";
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; 
+    }
+
+    function closeVideo() {
+        const modal = document.getElementById('videoModal');
+        const iframe = document.getElementById('videoIframe');
+        iframe.src = '';
+        modal.style.display = 'none';
+        document.body.style.overflow = ''; 
+    }
+
+    function rotateVideo() {
+        videoRotation = (videoRotation + 90) % 360;
+        const inner = document.getElementById('videoWrapperInner');
+        inner.style.transform = `rotate(${videoRotation}deg)`;
+        
+        if(videoRotation === 90 || videoRotation === 270) {
+            inner.style.width = window.innerHeight + 'px';
+            inner.style.height = window.innerWidth + 'px';
+        } else {
+            inner.style.width = '100%';
+            inner.style.height = 'auto';
+        }
+    }
+
+    function moveSlider(dir) {
+        const container = document.getElementById("detailSlider");
+        if (!container) return;
+        const total = container.children.length;
+        if (total <= 1) return;
+        if (typeof window.currentSlide === 'undefined') {
+            window.currentSlide = 0;
+        }
+        window.currentSlide = (window.currentSlide + dir + total) % total;
+        container.style.transform = `translateX(-${window.currentSlide * 100}%)`;
+    }
+
+    function getStaticMapImage(mapUrl) {
+        if (!mapUrl) return null;
+        const coordsMatch = mapUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (coordsMatch && coordsMatch.length >= 3) {
+            const lat = coordsMatch[1];
+            const lng = coordsMatch[2];
+            return `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=600x300&markers=color:red%7C${lat},${lng}&key=AIzaSyCSUx9cK6ntL2laSqKSuA1GgEWPj6KlUY8`;
+        }
+        return null;
+    }
+
+    function renderStars(rating) {
+        let stars = '';
+        for(let i=1; i<=5; i++) {
+            stars += `<i class="fas fa-star ${i <= rating ? 'star-filled' : 'star-empty'}" style="color: ${i <= rating ? '#fbbf24' : '#e5e7eb'};"></i>`;
+        }
+        return stars;
+    }
+
+    async function loadReviews(productId) {
+        const container = document.getElementById("reviewsList");
+        if (!container) return;
+        if (unsubscribeReviews) {
+            unsubscribeReviews();
+            unsubscribeReviews = null;
+        }
+        container.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-pulse"></i> جاري تحميل التقييمات...</div>';
+        try {
+            const snapshot = await db.collection("reviews")
+                .where("productId", "==", productId)
+                .get();
+            
+            let reviewsHtml = '';
+            let total = 0, sum = 0;
+            const reviewsArray = [];
+            snapshot.forEach(doc => {
+                reviewsArray.push({ id: doc.id, ...doc.data() });
+            });
+            reviewsArray.sort((a, b) => {
+                const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+                const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+                return dateB - dateA;
+            });
+            
+            reviewsArray.forEach(rev => {
+                sum += rev.rating;
+                total++;
+                const reviewDate = rev.createdAt?.toDate ? new Date(rev.createdAt.toDate()).toLocaleDateString('ar-EG') : 'تاريخ غير معروف';
+                reviewsHtml += `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="reviewer-name"><i class="fas fa-user-circle"></i> ${escapeHtml(rev.name)}</span>
+                            <div class="review-rating">${renderStars(rev.rating)}</div>
+                        </div>
+                        <div class="review-comment">${escapeHtml(rev.comment)}</div>
+                        <div class="review-date">${reviewDate}</div>
+                    </div>
+                `;
+            });
+            const avg = total ? (sum/total).toFixed(1) : 0;
+            const avgStars = renderStars(Math.round(avg));
+            const avgElement = document.getElementById("avgRatingValue");
+            if (avgElement) {
+                avgElement.innerHTML = `${avg} (${total} تقييم) ${avgStars}`;
+            }
+            container.innerHTML = reviewsHtml || '<p style="color: var(--text-light);">لا توجد تقييمات بعد. كن أول من يقيّم!</p>';
+        } catch(err) {
+            console.error("loadReviews error:", err);
+            container.innerHTML = '<p style="color: red;">حدث خطأ في تحميل التقييمات.</p>';
+        }
+    }
+
+    async function addReview(productId) {
+        const nameInput = document.getElementById("reviewerName");
+        const commentInput = document.getElementById("reviewComment");
+        const ratingInput = document.getElementById("selectedRatingValue");
+        const name = nameInput.value.trim();
+        const comment = commentInput.value.trim();
+        let rating = parseInt(ratingInput.value);
+        if (!name || !comment || !rating) {
+            alert("الرجاء إدخال الاسم والتقييم والتعليق");
+            return;
+        }
+        try {
+            await db.collection("reviews").add({
+                productId: productId,
+                name: name,
+                comment: comment,
+                rating: rating,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            nameInput.value = '';
+            commentInput.value = '';
+            alert("تم إضافة تقييمك بنجاح شكراً لك!");
+            loadReviews(productId);
+        } catch(e) {
+            console.error("addReview error:", e);
+        }
+    }
+
+    function setRating(val) {
+        document.getElementById("selectedRatingValue").value = val;
+        const stars = document.querySelectorAll('.rating-input i');
+        stars.forEach((star, idx) => {
+            if(idx < val) star.classList.add('active-star');
+            else star.classList.remove('active-star');
+        });
+    }
+    
+    function refreshReviews() {
+        if (currentProductId) {
+            loadReviews(currentProductId);
+        }
+    }
+
+    async function loadLandingPage(id) {
+        currentProductId = id;
+        document.getElementById("grid").style.display = "none";
+        document.getElementById("loader").style.display = "block";
+        window.currentSlide = 0;
+        document.getElementById('mainHeader').classList.add('hide-header');
+        document.getElementById('mainNav').classList.add('hide-nav');
+        document.getElementById('quickFilters').classList.add('hide-filters');
+        
+        const newUrl = window.location.pathname + '?id=' + id;
+        window.history.pushState({id: id}, '', newUrl);
+
+        try {
+            db.collection("products").doc(id).update({
+                views: firebase.firestore.FieldValue.increment(1)
+            });
+            const doc = await db.collection("products").doc(id).get();
+            document.getElementById("loader").style.display = "none";
+            const p = doc.data();
+            currentUnit = p.name;
+            ownerWhatsApp = p.ownerPhone || "201214277900";
+            currentImagesForLightbox = getAllValidImages(p);
+            const allImages = currentImagesForLightbox;
+            
+            let videoHtml = "";
+            if(p.videoUrl) {
+                const vId = getYoutubeId(p.videoUrl);
+                if(vId) videoHtml = `
+                    <div class="detail-section" style="padding:0; overflow:hidden; border-radius: 0; margin-left: -20px; margin-right: -20px;">
+                        <div class="video-placeholder" onclick="openVideo('${vId}')">
+                            <img src="https://img.youtube.com/vi/${vId}/hqdefault.jpg">
+                            <div class="play-overlay"><i class="fas fa-play-circle"></i></div>
+                        </div>
+                    </div>`;
+            }
+
+            let featuresHtml = "";
+            if (p.note1) {
+                const features = p.note1.split('\n').filter(f => f.trim());
+                featuresHtml = features.map(f => `<div class="feature-row"><i class="fas fa-check-circle" style="color:var(--primary); font-size: 1.2rem;"></i> ${escapeHtml(f)}</div>`).join('');
+            }
+
+            let extraFieldsHtml = "";
+            if (p.extraFields && Array.isArray(p.extraFields) && p.extraFields.length > 0) {
+                const validFields = p.extraFields.filter(field => field && field.key && field.key.trim() !== "" && field.value && field.value.trim() !== "");
+                if (validFields.length > 0) {
+                    extraFieldsHtml = `<div class="extra-fields-section"><div class="section-title"><i class="fas fa-star"></i> تفاصيل إضافية</div>`;
+                    validFields.forEach(field => {
+                        extraFieldsHtml += `<div class="extra-field-row"><i class="fas fa-star" style="color:var(--accent);"></i> <strong>${escapeHtml(field.key)}:</strong> <span style="margin-right: 8px;">${escapeHtml(field.value)}</span></div>`;
+                    });
+                    extraFieldsHtml += `</div>`;
+                }
+            }
+
+            let priceBoxHtml = `
+                <div class="price-box-container">
+                    <span class="price-main-val">${p.price || 0} ج.م <small style="font-size:0.85rem; color: var(--text-light);">/ حسب الخدمة</small></span>
+                    <div style="margin-bottom: 15px; color: var(--text-light); font-weight: 700;">
+                        <i class="fas fa-eye" style="color: var(--primary);"></i> المشاهدات: ${p.views || 0}
+                    </div>
+                    <div class="oval-badges" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px;">
+                        ${p.promoTag ? `<span class="oval-badge" style="background: linear-gradient(135deg, var(--accent), var(--accent-dark)); padding: 8px 20px; border-radius: 60px; font-size: 0.85rem; font-weight: 800; color: white; box-shadow: var(--shadow-sm);"><i class="fas fa-fire"></i> ${escapeHtml(p.promoTag)}</span>` : ''}
+                        ${p.category ? `<span class="oval-badge" style="background: linear-gradient(135deg, #059669, #047857); padding: 8px 20px; border-radius: 60px; font-size: 0.85rem; font-weight: 800; color: white; box-shadow: var(--shadow-sm);"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(p.category)}</span>` : ''}
+                    </div>
+                </div>`;
+
+            const sliderImages = allImages.map((img, index) => `<img src="${img}" loading="lazy" onclick="openLightbox(${index})" style="cursor: zoom-in;" onerror="this.src='1000580696.png'">`).join('');
+            
+            let mapHtml = "";
+            if (p.mapUrl && p.mapUrl.trim() !== "") {
+                const staticMap = getStaticMapImage(p.mapUrl);
+                const mapImageSrc = staticMap ? staticMap : 'map.jpeg';
+                mapHtml = `
+                <div class="detail-section">
+                    <div class="section-title"><i class="fas fa-map"></i> الموقع على الخريطة</div>
+                    <a href="${escapeHtml(p.mapUrl)}" target="_blank" style="text-decoration: none; display: block;">
+                        <img src="${mapImageSrc}" loading="lazy" alt="خريطة الموقع" class="map-preview-image" onerror="this.src='map.jpeg'">
+                        <div class="info-row" style="margin-top: 10px; justify-content: center;">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>اضغط لعرض الموقع على الخريطة</span>
+                        </div>
+                    </a>
+                </div>`;
+            }
+
+            const reviewsHtmlSection = `
+                <div class="detail-section" id="reviewsSection">
+                    <div class="section-title"><i class="fas fa-star"></i> التقييمات</div>
+                    <div class="avg-rating" id="avgRatingDisplay">
+                        <span>متوسط التقييم:</span> <span id="avgRatingValue">0</span>
+                        <button class="refresh-reviews-btn" onclick="refreshReviews()"><i class="fas fa-sync-alt"></i> تحديث</button>
+                    </div>
+                    <div id="reviewsList" style="max-height: 400px; overflow-y: auto;"></div>
+                    <div class="add-review-form">
+                        <div class="section-title" style="margin-bottom: 15px;"><i class="fas fa-edit"></i> أضف تقييمك</div>
+                        <div class="form-group">
+                            <label>الاسم</label>
+                            <input type="text" id="reviewerName" placeholder="اسمك الكريم" maxlength="50">
+                        </div>
+                        <div class="form-group">
+                            <label>التقييم بالنجوم</label>
+                            <div class="rating-input">
+                                <i class="fas fa-star" onclick="setRating(1)"></i>
+                                <i class="fas fa-star" onclick="setRating(2)"></i>
+                                <i class="fas fa-star" onclick="setRating(3)"></i>
+                                <i class="fas fa-star" onclick="setRating(4)"></i>
+                                <i class="fas fa-star" onclick="setRating(5)"></i>
+                            </div>
+                            <input type="hidden" id="selectedRatingValue" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label>تعليقك</label>
+                            <textarea id="reviewComment" rows="3" placeholder="شاركنا رأيك..." maxlength="300"></textarea>
+                        </div>
+                        <button class="submit-review-btn" onclick="addReview('${id}')"><i class="fas fa-paper-plane"></i> إرسال التقييم</button>
+                    </div>
+                </div>`;
+
+            document.getElementById("landingPage").style.display = "block";
+            document.getElementById("productContent").innerHTML = `
+                <div class="action-bar">
+                    <button class="back-btn" onclick="loadStore()"><i class="fas fa-arrow-right"></i> رجوع</button>
+                    <button class="share-btn" onclick="shareProduct()"><i class="fas fa-share-alt"></i> مشاركة الصفحة</button>
+                </div>
+                <div class="detail-section">
+                    <h1 style="margin:0; font-size:1.6rem; color: var(--text);">${escapeHtml(p.name)}</h1>
+                </div>
+                <div class="slider-wrapper">
+                    <div class="slider-container" id="detailSlider">
+                        ${sliderImages}
+                    </div>
+                    ${allImages.length > 1 ? `
+                        <div class="slider-nav">
+                            <button class="nav-btn" onclick="moveSlider(1)"><i class="fas fa-chevron-right"></i></button>
+                            <button class="nav-btn" onclick="moveSlider(-1)"><i class="fas fa-chevron-left"></i></button>
+                        </div>
+                    ` : ''}
+                </div>
+                ${priceBoxHtml}
+                ${videoHtml}
+                <div class="detail-section">
+                    <div class="section-title"><i class="fas fa-list-check"></i> المميزات والتفاصيل</div>
+                    <div>${featuresHtml || '<p style="color: var(--text-light);">لا توجد مميزات مضافة</p>'}</div>
+                </div>
+                ${extraFieldsHtml}
+                ${mapHtml}
+                ${reviewsHtmlSection}
+                <div class="detail-section" style="display: flex; gap: 10px;">
+                    <button onclick="window.open('https://wa.me/${ownerWhatsApp}?text=${encodeURIComponent('استفسار عن: ' + p.name)}', '_blank')" class="book-btn" style="background: linear-gradient(135deg, #25D366, #128C7E); padding: 18px; font-size: 1.1rem; flex: 1;">
+                        <i class="fab fa-whatsapp"></i> واتساب
+                    </button>
+                    <a href="tel:${ownerWhatsApp}" class="book-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 18px; font-size: 1.1rem; flex: 1; text-decoration: none;">
+                        <i class="fas fa-phone-alt"></i> اتصال هاتفي
+                    </a>
+                </div>
+                <div class="detail-section" style="text-align:center; background: #fffbeb; border: 2px dashed #f59e0b;">
+                    <p style="margin-bottom:15px; font-weight:700; color:#b45309;">هل تريد نشر إعلان مثل هذا؟</p>
+                    <button onclick="window.open('https://wa.me/201214277900?text=${encodeURIComponent('أريد نشر إعلان مماثل على تطبيق مصيف مطروح')}', '_blank')" class="book-btn" style="background: #25D366; width: auto; display: inline-flex; padding: 10px 25px;">
+                        <i class="fab fa-whatsapp"></i> تواصل معنا الآن
+                    </button>
+                </div>
+                <div id="dummy-gallery" style="display: none;"></div>`;
+            setRating(5);
+            loadReviews(id);
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        } catch(e) { console.error(e); }
+    }
+
+    function getYoutubeId(url) {
+        if (!url) return null;
+        const match = url.match(/(?:youtube\.com\/watch\?v=|youtu.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^\/\?&]+)/);
+        return (match && match[1]) ? match[1] : null;
+    }
+
+    function openProduct(id) { loadLandingPage(id); }
+    function escapeHtml(str) { 
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); 
+    }
+
+    window.onload = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        if (productId) {
+            openProduct(productId);
+        } else {
+            loadStore();
+        }
+        loadCategoriesForSidebar();
+    };
+
+    // تسجيل Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').then(reg => {
+                console.log('SW Registered');
+            }).catch(err => console.log('SW failed', err));
+        });
+    }
+</script>
+</body>
+</html>

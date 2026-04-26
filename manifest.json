@@ -1,0 +1,22 @@
+{
+  "name": "مصيف مطروح | Aly Tech",
+  "short_name": "مصيف مطروح",
+  "description": "تطبيق حجز الشقق والمصايف في مرسى مطروح",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#7c3aed",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "1000580696.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "1000580696.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
