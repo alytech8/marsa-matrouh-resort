@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مصيف مطروح | Aly Tech</title>
     
+    <meta property="og:title" content="شقق ومصايف مرسى مطروح">
+    <meta property="og:description" content="احجز شقتك الآن في مطروح بأفضل الأسعار. عرض الصور، التقييمات، والحجز المباشر.">
+    <meta property="og:image" content="https://marsa-matrouh-resort.vercel.app/map.jpeg">
+    <meta property="og:url" content="https://marsa-matrouh-resort.vercel.app">
+    <meta property="og:type" content="website">
+
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#7c3aed">
     <link rel="apple-touch-icon" href="1000580696.png">
@@ -777,6 +783,9 @@
             line-height: 1.6;
             font-size: 0.9rem;
         }
+        .review-comment p {
+            margin: 0;
+        }
         .review-date {
             font-size: 0.7rem;
             color: var(--text-light);
@@ -1272,21 +1281,14 @@
     function shareProduct() {
         const baseUrl = window.location.origin + window.location.pathname;
         const shareUrl = `${baseUrl}?id=${currentProductId}`;
-        const productName = currentUnit;
-
+        
         if (navigator.share) {
             navigator.share({
-                title: productName,
-                text: `تفقد ${productName} على تطبيق مصيف مطروح`,
+                title: currentUnit,
                 url: shareUrl
             }).catch(() => {});
         } else {
-            const dummy = document.createElement('input');
-            document.body.appendChild(dummy);
-            dummy.value = shareUrl;
-            dummy.select();
-            document.execCommand('copy');
-            document.body.removeChild(dummy);
+            navigator.clipboard.writeText(shareUrl);
             alert('تم نسخ رابط صفحة الهبوط! يمكنك مشاركته الآن');
         }
     }
@@ -1474,7 +1476,11 @@
             document.getElementById("loader").style.display = "none";
             const p = doc.data();
             currentUnit = p.name;
-            ownerWhatsApp = p.ownerPhone || "201214277900";
+            
+            // تصحيح رقم الهاتف ليكون بالصيغة الدولية (20+ قبل الرقم وحذف الصفر الأول)
+            let rawPhone = p.ownerPhone || "01214277900";
+            ownerWhatsApp = rawPhone.startsWith('0') ? '2' + rawPhone : rawPhone;
+            
             currentImagesForLightbox = getAllValidImages(p);
             const allImages = currentImagesForLightbox;
             
@@ -1605,7 +1611,7 @@
                     <button onclick="window.open('https://wa.me/${ownerWhatsApp}?text=${encodeURIComponent('استفسار عن: ' + p.name)}', '_blank')" class="book-btn" style="background: linear-gradient(135deg, #25D366, #128C7E); padding: 18px; font-size: 1.1rem; flex: 1;">
                         <i class="fab fa-whatsapp"></i> واتساب
                     </button>
-                    <a href="tel:${ownerWhatsApp}" class="book-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 18px; font-size: 1.1rem; flex: 1; text-decoration: none;">
+                    <a href="tel:${p.ownerPhone || '01214277900'}" class="book-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 18px; font-size: 1.1rem; flex: 1; text-decoration: none;">
                         <i class="fas fa-phone-alt"></i> اتصال هاتفي
                     </a>
                 </div>
